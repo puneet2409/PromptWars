@@ -55,7 +55,7 @@ const NavButton = React.memo(({ id, icon, label, currentTab, setTab }) => {
 });
 
 export default function App() {
-  const { user } = useAuth();
+  const { user, login, updateSeat } = useAuth();
   const [currentTab, setCurrentTab] = useState('map');
 
   const handleSetTab = useCallback((tab) => {
@@ -64,7 +64,7 @@ export default function App() {
 
   // Enforce Onboarding Flow
   if (!user || !user.seat) {
-    return <OnboardingPage />;
+    return <OnboardingPage user={user} login={login} updateSeat={updateSeat} />;
   }
 
   return (
