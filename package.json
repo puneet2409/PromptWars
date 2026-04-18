@@ -1,22 +1,31 @@
 {
-  "name": "temp-app",
+  "name": "promptwars",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "start": "node server.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@react-oauth/google": "^0.12.1",
     "classnames": "^2.5.1",
-    "lucide-react": "^1.8.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "dompurify": "^3.1.5",
+    "express": "^5.2.1",
+    "lucide-react": "^0.395.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
@@ -24,6 +33,9 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
-    "vite": "^8.0.4"
+    "jsdom": "^24.1.0",
+    "vite": "^8.0.4",
+    "vite-plugin-pwa": "^0.20.0",
+    "vitest": "^2.0.0"
   }
 }
