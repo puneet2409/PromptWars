@@ -1,12 +1,33 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import helmet from 'helmet';
+import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+app.use(cors());
+
+// Add Helmet for security headers and configure CSP to allow Gemini API and data blobs
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", "https://generativelanguage.googleapis.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:"],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // Serve the static files from the Vite build directory
 app.use(express.static(path.join(__dirname, 'dist')));
