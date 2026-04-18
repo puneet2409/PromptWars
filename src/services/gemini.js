@@ -19,16 +19,21 @@ export const fetchAssistantResponse = async (prompt, history, userMessage) => {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-2.0-flash',
+      systemInstruction: prompt 
+    });
 
-    // Build conversation as a single prompt for maximum compatibility
-    const contextMessages = history
-      .map((m) => `${m.role === 'assistant' ? 'Assistant' : 'User'}: ${m.content}`)
-      .join('\n');
+    const formattedHistory = history.map((m) => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
 
-    const fullPrompt = `${prompt}\n\n--- Conversation History ---\n${contextMessages}\n\nUser: ${userMessage}\n\nAssistant:`;
+    const chat = model.startChat({
+      history: formattedHistory,
+    });
 
-    const result = await model.generateContent(fullPrompt);
+    const result = await chat.sendMessage(userMessage);
     const response = await result.response;
     const text = response.text();
 

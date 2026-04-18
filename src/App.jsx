@@ -56,7 +56,7 @@ const NavButton = React.memo(({ id, icon, label, currentTab, setTab }) => {
 });
 
 export default function App() {
-  const { user, login, updateSeat } = useAuth();
+  const { user } = useAuth();
   const [currentTab, setCurrentTab] = useState('map');
 
   const handleSetTab = useCallback((tab) => {

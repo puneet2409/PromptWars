@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAssistant } from '../hooks/useAssistant';
-import * as geminiService from '../services/gemini';
 
 vi.mock('../services/gemini', () => ({
   fetchAssistantResponse: vi.fn().mockResolvedValue('Mocked AI Reply')

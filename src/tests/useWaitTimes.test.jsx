@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useWaitTimes } from '../hooks/useWaitTimes';
-import * as dbService from '../services/db';
 
 vi.mock('../services/db', () => ({
   subscribeToLiveUpdates: vi.fn((cb) => {

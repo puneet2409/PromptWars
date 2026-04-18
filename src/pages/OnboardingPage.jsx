@@ -1,4 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useCallback } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
 
 export const STADIUMS = [
@@ -51,18 +53,17 @@ export default function OnboardingPage() {
         <p style={{ color: '#94a3b8', textAlign: 'center', maxWidth: '320px', lineHeight: 1.5, marginBottom: '40px' }}>
           Connect to the venue neural net for live turn-by-turn routing and wait time intelligence.
         </p>
-        <button
-          onClick={() => login({ credential: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiU3RhZGl1bSBGYW4iLCJlbWFpbCI6ImZhbkBuYXZpc3RhZGl1bS5kZXYiLCJwaWN0dXJlIjoiIn0' })}
-          style={{
-            padding: '16px 32px', background: '#3b82f6', color: '#fff',
-            fontWeight: 700, borderRadius: '12px', border: 'none',
-            fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit',
-            boxShadow: '0 8px 24px rgba(59,130,246,0.3)',
-            transition: 'transform 200ms, box-shadow 200ms',
-          }}
-        >
-          Authenticate to Enter
-        </button>
+        <div style={{ marginTop: '20px' }}>
+          <GoogleLogin
+            onSuccess={(credentialResponse) => login(credentialResponse)}
+            onError={() => {
+              console.error('Google Sign In Failed');
+            }}
+            theme="filled_blue"
+            shape="pill"
+            text="signin_with"
+          />
+        </div>
       </section>
     );
   }

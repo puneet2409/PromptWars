@@ -197,7 +197,6 @@ export default function MapPage() {
             <g style={{ transition: 'opacity 0.5s', opacity: selectedZone ? 0.25 : 1 }}>
               {liveAttendees.map(a => {
                 const r     = a.isMoving ? 3.5 : 2;
-                const glow  = a.isMoving ? a.color : 'transparent';
                 const alpha = a.isMoving ? 0.95 : 0.45;
                 return (
                   <g key={a.id}>

@@ -17,77 +17,80 @@ const STATS = {
   total: 489
 };
 
+// Precompute static layout map outside of render to guarantee purity and maximum efficiency
+const { initialSeats, computedAisles } = (() => {
+  const generatedSeats = [];
+  const rows = 12;
+  const blocksWidth = [7, 11, 11, 7];
+  
+  const aisleAngle = 4 * (Math.PI / 180); 
+  const totalAisles = 3;
+  const totalAisleAngle = aisleAngle * totalAisles;
+  
+  const totalCols = 36;
+  const availableAngle = Math.PI - totalAisleAngle;
+  const anglePerCol = availableAngle / totalCols;
+
+  const innerRadius = 160;
+  const outerRadius = 450;
+  const rowThickness = (outerRadius - innerRadius) / rows;
+
+  let currentAngle = Math.PI; 
+  const computedAislesLocal = [Math.PI]; // Leftmost edge is essentially Gate A
+
+  blocksWidth.forEach((cols, bIndex) => {
+    const blockSpan = cols * anglePerCol;
+    
+    for (let r = 0; r < rows; r++) {
+      const radius = innerRadius + r * rowThickness;
+      
+      for (let c = 0; c < cols; c++) {
+        const theta = currentAngle - (c + 0.5) * anglePerCol;
+        
+        const cx = 500 + radius * Math.cos(theta);
+        const cy = 550 - radius * Math.sin(theta);
+        
+        let status = 'available';
+        const randomFactor = Math.random();
+        
+        if (bIndex === 0) {
+          status = randomFactor > 0.9 ? 'reserved' : 'available';
+        } else if (bIndex === 1) {
+          status = randomFactor > 0.85 ? 'reserved' : (randomFactor > 0.75 ? 'filled' : 'available');
+        } else if (bIndex === 2) {
+          status = randomFactor > 0.4 ? 'filled' : (randomFactor > 0.35 ? 'reserved' : 'available');
+        } else if (bIndex === 3) {
+          status = randomFactor > 0.9 ? 'reserved' : 'filled';
+        }
+
+        generatedSeats.push({
+          id: `R${r}-B${bIndex}-C${c}`,
+          cx,
+          cy,
+          theta,
+          status,
+          radius
+        });
+      }
+    }
+    
+    currentAngle -= blockSpan;
+    if (bIndex < 3) {
+      computedAislesLocal.push(currentAngle - aisleAngle / 2); // Center of the aisle
+      currentAngle -= aisleAngle;
+    } else {
+      computedAislesLocal.push(0); // Rightmost edge
+    }
+  });
+
+  return { initialSeats: generatedSeats, computedAisles: computedAislesLocal };
+})();
+
 const StadiumSeating = () => {
   const { user } = useAuth();
 
-  const { seats, aisles } = useMemo(() => {
-    const generatedSeats = [];
-    const rows = 12;
-    const blocksWidth = [7, 11, 11, 7];
-    
-    const aisleAngle = 4 * (Math.PI / 180); 
-    const totalAisles = 3;
-    const totalAisleAngle = aisleAngle * totalAisles;
-    
-    const totalCols = 36;
-    const availableAngle = Math.PI - totalAisleAngle;
-    const anglePerCol = availableAngle / totalCols;
-
-    const innerRadius = 160;
-    const outerRadius = 450;
-    const rowThickness = (outerRadius - innerRadius) / rows;
-
-    let currentAngle = Math.PI; 
-    const computedAisles = [Math.PI]; // Leftmost edge is essentially Gate A
-
-    blocksWidth.forEach((cols, bIndex) => {
-      const blockSpan = cols * anglePerCol;
-      
-      for (let r = 0; r < rows; r++) {
-        const radius = innerRadius + r * rowThickness;
-        
-        for (let c = 0; c < cols; c++) {
-          const theta = currentAngle - (c + 0.5) * anglePerCol;
-          
-          const cx = 500 + radius * Math.cos(theta);
-          const cy = 550 - radius * Math.sin(theta);
-          
-          let status = 'available';
-          const randomFactor = Math.random();
-          
-          if (bIndex === 0) {
-            status = randomFactor > 0.9 ? 'reserved' : 'available';
-          } else if (bIndex === 1) {
-            status = randomFactor > 0.85 ? 'reserved' : (randomFactor > 0.75 ? 'filled' : 'available');
-          } else if (bIndex === 2) {
-            status = randomFactor > 0.4 ? 'filled' : (randomFactor > 0.35 ? 'reserved' : 'available');
-          } else if (bIndex === 3) {
-            status = randomFactor > 0.9 ? 'reserved' : 'filled';
-          }
-
-          generatedSeats.push({
-            id: `R${r}-B${bIndex}-C${c}`,
-            cx,
-            cy,
-            theta,
-            status,
-            radius
-          });
-        }
-      }
-      
-      currentAngle -= blockSpan;
-      if (bIndex < 3) {
-        computedAisles.push(currentAngle - aisleAngle / 2); // Center of the aisle
-        currentAngle -= aisleAngle;
-      } else {
-        computedAisles.push(0); // Rightmost edge
-      }
-    });
-
-    return { seats: generatedSeats, aisles: computedAisles };
-  }, []);
-
+  const seats = initialSeats;
+  const aisles = computedAisles;
   const { targetSeatObj, targetPath, startGateAngle } = useMemo(() => {
     if (!user || !user.seat) return { targetSeatObj: null, targetPath: null, startGateAngle: null };
     
