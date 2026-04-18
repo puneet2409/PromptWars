@@ -1,6 +1,8 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
-export const useAuth = () => {
+const AuthContext = createContext(null);
+
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('user_session')) || null;
@@ -43,5 +45,17 @@ export const useAuth = () => {
     localStorage.removeItem('user_session');
   }, []);
 
-  return { user, login, logout, updateSeat };
+  return (
+    <AuthContext.Provider value={{ user, login, logout, updateSeat }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

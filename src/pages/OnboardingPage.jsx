@@ -12,7 +12,8 @@ const SECTIONS = Array.from({ length: 12 }, (_, i) => `${100 + i}`);
 const ROWS = 'ABCDEFGHIJKLMNOP'.split('');
 const SEATS = Array.from({ length: 20 }, (_, i) => `${i + 1}`);
 
-export default function OnboardingPage({ user, login, updateSeat }) {
+export default function OnboardingPage() {
+  const { user, login, updateSeat } = useAuth();
   const [stadium, setStadium] = useState(STADIUMS[0].id);
   const [section, setSection] = useState('');
   const [row, setRow] = useState('');

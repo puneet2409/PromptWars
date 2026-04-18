@@ -64,7 +64,7 @@ export default function App() {
 
   // Enforce Onboarding Flow
   if (!user || !user.seat) {
-    return <OnboardingPage user={user} login={login} updateSeat={updateSeat} />;
+    return <OnboardingPage />;
   }
 
   return (
