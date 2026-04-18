@@ -1,30 +1,27 @@
 import React, { Suspense, useState, useCallback } from 'react';
 import { SkeletonLoader } from './components/SkeletonLoader';
+import OnboardingPage from './pages/OnboardingPage';
+import { useAuth } from './hooks/useAuth';
 import './index.css';
 
 const ChatPage = React.lazy(() => import('./pages/ChatPage'));
 const MapPage = React.lazy(() => import('./pages/MapPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 
-/**
- * Global ErrorBoundary — catches render failures across the entire tree.
- */
-class ErrorBoundary extends React.Component {
+class AppErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false };
   }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
+  static getDerivedStateFromError() {
+    return { hasError: true };
   }
-
   render() {
     if (this.state.hasError) {
       return (
-        <div role="alert" style={{ padding: '32px', color: '#f8fafc', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '12px' }}>Something went wrong</h1>
-          <p style={{ color: '#94a3b8' }}>Please refresh the page to try again.</p>
+        <div role="alert" style={{ padding: 20, color: '#ef4444' }}>
+          <h2>Application Error</h2>
+          <p>Please refresh the page to try again.</p>
         </div>
       );
     }
@@ -32,64 +29,71 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-/** @type {Array<{id: string, label: string, icon: string}>} */
-const NAV_ITEMS = [
-  { id: 'map', label: 'Map', icon: '🗺️' },
-  { id: 'chat', label: 'AI Guide', icon: '🤖' },
-  { id: 'profile', label: 'Profile', icon: '👤' },
-];
+const NavButton = React.memo(({ id, icon, label, currentTab, setTab }) => {
+  const isCurrent = currentTab === id;
+  return (
+    <button
+      onClick={() => setTab(id)}
+      aria-current={isCurrent ? 'page' : undefined}
+      style={{
+        flex: 1, padding: '12px', background: 'none', border: 'none',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        color: isCurrent ? '#3b82f6' : '#64748b', cursor: 'pointer',
+        fontFamily: 'inherit',
+      }}
+    >
+      <span style={{ fontSize: '1.4rem', marginBottom: '4px' }} aria-hidden="true">{icon}</span>
+      <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>{label}</span>
+      {isCurrent && (
+        <span style={{
+          position: 'absolute', bottom: 0, width: '32px', height: '3px',
+          background: '#3b82f6', borderRadius: '3px 3px 0 0'
+        }} />
+      )}
+    </button>
+  );
+});
 
-/**
- * Root application — handles tab-based navigation with lazy-loaded pages.
- * @returns {React.ReactElement}
- */
-function App() {
-  const [tab, setTab] = useState('chat');
-  const onTabChange = useCallback((id) => setTab(id), []);
+export default function App() {
+  const { user } = useAuth();
+  const [currentTab, setCurrentTab] = useState('map');
+
+  const handleSetTab = useCallback((tab) => {
+    setCurrentTab(tab);
+  }, []);
+
+  // Enforce Onboarding Flow
+  if (!user || !user.seat) {
+    return <OnboardingPage />;
+  }
 
   return (
-    <ErrorBoundary>
-      <div style={{
-        display: 'flex', flexDirection: 'column', height: '100dvh',
-        background: 'linear-gradient(180deg, #020617 0%, #0f172a 100%)',
-      }}>
-        {/* Skip-link target */}
+    <AppErrorBoundary>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#020617' }}>
+        
+        {/* Main Content Area */}
         <main id="main-content" style={{ flex: 1, overflow: 'hidden' }}>
           <Suspense fallback={<SkeletonLoader />}>
-            {tab === 'chat' && <ChatPage />}
-            {tab === 'map' && <MapPage />}
-            {tab === 'profile' && <ProfilePage />}
+            {currentTab === 'map' && <MapPage />}
+            {currentTab === 'chat' && <ChatPage />}
+            {currentTab === 'profile' && <ProfilePage />}
           </Suspense>
         </main>
 
-        <nav aria-label="Main navigation" style={{
-          display: 'flex', padding: '8px 12px 12px', gap: '4px',
-          background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(12px)',
-          borderTop: '1px solid rgba(148, 163, 184, 0.1)',
-        }}>
-          {NAV_ITEMS.map(({ id, label, icon }) => (
-            <button
-              key={id}
-              onClick={() => onTabChange(id)}
-              aria-current={tab === id ? 'page' : undefined}
-              style={{
-                flex: 1, padding: '10px 0', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: '4px', border: 'none', borderRadius: '12px',
-                background: tab === id ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
-                color: tab === id ? '#3b82f6' : '#64748b',
-                fontWeight: tab === id ? 700 : 500, fontSize: '0.75rem',
-                cursor: 'pointer', transition: 'all 200ms ease',
-                fontFamily: 'inherit',
-              }}
-            >
-              <span style={{ fontSize: '1.25rem' }} aria-hidden="true">{icon}</span>
-              {label}
-            </button>
-          ))}
+        {/* Bottom Navigation */}
+        <nav
+          aria-label="Main navigation"
+          style={{
+            display: 'flex', background: '#0f172a',
+            borderTop: '1px solid #1e293b', position: 'relative',
+          }}
+        >
+          <NavButton id="map" icon="🗺️" label="Map" currentTab={currentTab} setTab={handleSetTab} />
+          <NavButton id="chat" icon="🤖" label="AI Guide" currentTab={currentTab} setTab={handleSetTab} />
+          <NavButton id="profile" icon="👤" label="Settings" currentTab={currentTab} setTab={handleSetTab} />
         </nav>
       </div>
-    </ErrorBoundary>
+    </AppErrorBoundary>
   );
 }
-
-export default App;
