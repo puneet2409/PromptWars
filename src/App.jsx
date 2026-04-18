@@ -7,6 +7,7 @@ import './index.css';
 const ChatPage = React.lazy(() => import('./pages/ChatPage'));
 const MapPage = React.lazy(() => import('./pages/MapPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const SeatingPage = React.lazy(() => import('./pages/SeatingPage'));
 
 class AppErrorBoundary extends React.Component {
   constructor(props) {
@@ -76,6 +77,7 @@ export default function App() {
         <main id="main-content" style={{ flex: 1, overflow: 'hidden' }}>
           <Suspense fallback={<SkeletonLoader />}>
             {currentTab === 'map' && <MapPage />}
+            {currentTab === 'seating' && <SeatingPage />}
             {currentTab === 'chat' && <ChatPage />}
             {currentTab === 'profile' && <ProfilePage />}
           </Suspense>
@@ -90,6 +92,7 @@ export default function App() {
           }}
         >
           <NavButton id="map" icon="🗺️" label="Map" currentTab={currentTab} setTab={handleSetTab} />
+          <NavButton id="seating" icon="🏛️" label="Seats" currentTab={currentTab} setTab={handleSetTab} />
           <NavButton id="chat" icon="🤖" label="AI Guide" currentTab={currentTab} setTab={handleSetTab} />
           <NavButton id="profile" icon="👤" label="Settings" currentTab={currentTab} setTab={handleSetTab} />
         </nav>

@@ -94,19 +94,26 @@ export default function OnboardingPage() {
                 boxShadow: isSelected ? `0 8px 24px ${s.ring}33` : 'none',
               }}
             >
-              {/* Procedural Stadium SVG Background */}
-              <svg width="100%" height="100%" viewBox="0 0 220 140" style={{ position: 'absolute', top: 0, left: 0, opacity: isSelected ? 1 : 0.4, transition: 'opacity 0.3s' }}>
-                <defs>
-                  <linearGradient id={`grad-${s.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor={s.ring} stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <rect width="220" height="140" fill={`url(#grad-${s.id})`} />
-                <ellipse cx="110" cy="70" rx="90" ry="50" fill="none" stroke={s.ring} strokeWidth="1" strokeDasharray="4 2" opacity="0.3" />
-                <ellipse cx="110" cy="70" rx="70" ry="35" fill="none" stroke={s.ring} strokeWidth="2" opacity="0.5" />
-                <rect x="80" y="55" width="60" height="30" rx="4" fill={s.ring} opacity="0.2" />
-              </svg>
+              {/* AI Generated Realistic Stadium Image */}
+              <div style={{
+                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                backgroundImage: 'url(/modern_stadium_asset.jpg)',
+                backgroundSize: 'cover', backgroundPosition: 'center 30%',
+                filter: isSelected ? 'brightness(1.1) contrast(1.1)' : 'brightness(0.6) grayscale(0.6)',
+                transition: 'all 0.4s ease', opacity: isSelected ? 1 : 0.6
+              }}>
+                {/* Tone styling based on stadium color variables so they feel unique */}
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                  backgroundColor: s.ring, mixBlendMode: 'color', opacity: isSelected ? 0.4 : 0.1,
+                  transition: 'opacity 0.4s ease'
+                }} />
+                {/* Gradient vignette to blend smoothly into the card border */}
+                <div style={{
+                   position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                   background: 'radial-gradient(ellipse at center, rgba(15,23,42,0) 40%, rgba(15,23,42,0.8) 100%)'
+                }} />
+              </div>
               
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px', background: 'linear-gradient(to top, #0f172a, transparent)' }}>
                 <h3 style={{ color: '#fff', fontSize: '1rem', fontWeight: 700, margin: '0 0 2px' }}>{s.name}</h3>
